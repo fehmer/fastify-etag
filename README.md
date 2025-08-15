@@ -59,6 +59,8 @@ app.listen(3000)
 
 * `weak`: generates weak ETags by default. Default: `false`.
 
+* `etagPrefix`: optional prefix for all ETags. Default: none
+
 ### Automatic 304 status codes
 
 By default, the plugin sends a 304 status code when the ETag is equal to the Etag specified by the if-none-match request header.

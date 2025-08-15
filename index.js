@@ -17,10 +17,10 @@ function validateAlgorithm (algorithm) {
   }
 }
 
-function buildHashFn (algorithm = 'sha1', weak = false) {
+function buildHashFn (algorithm = 'sha1', weak = false, etagPrefix = '') {
   validateAlgorithm(algorithm)
 
-  const prefix = weak ? 'W/"' : '"'
+  const prefix = (weak ? 'W/"' : '"') + etagPrefix
   if (algorithm === 'fnv1a') {
     return (payload) => prefix + fnv1a(payload).toString(36) + '"'
   }
@@ -29,8 +29,8 @@ function buildHashFn (algorithm = 'sha1', weak = false) {
     .update(payload).digest('base64') + '"'
 }
 
-async function fastifyEtag (app, { algorithm, weak, replyWith304 = true }) {
-  const hash = buildHashFn(algorithm, weak)
+async function fastifyEtag (app, { algorithm, weak, replyWith304 = true, etagPrefix }) {
+  const hash = buildHashFn(algorithm, weak, etagPrefix)
 
   app.addHook('onSend', function (req, reply, payload, done) {
     let etag = reply.getHeader('etag')

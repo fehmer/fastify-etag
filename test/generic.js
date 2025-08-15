@@ -145,4 +145,22 @@ module.exports = async function (t, etagOpts, hashFn) {
     t.assert.deepStrictEqual(res.headers['content-length'], '0')
     t.assert.deepStrictEqual(res.headers.etag, 'W/' + hash)
   })
+
+  await t.test('returns a weak etag with prefix for each request when weak and prefix is in opts', async (t) => {
+    const res = await build({ weak: true, etagPrefix: '42' }).inject({
+      url: '/'
+    })
+
+    t.assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
+    t.assert.deepStrictEqual(res.headers.etag, 'W/"42' + hash.slice(1))
+  })
+
+  await t.test('returns a strong etag with prefix for each request when strong and prefix is in opts', async (t) => {
+    const res = await build({ etagPrefix: '42' }).inject({
+      url: '/'
+    })
+
+    t.assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
+    t.assert.deepStrictEqual(res.headers.etag, '"42' + hash.slice(1))
+  })
 }
